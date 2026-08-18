@@ -4,6 +4,9 @@ import path from "node:path"
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
+// Every alert — failure or all-green — goes to Daniel too.
+const EXTRA_RECIPIENTS = ["daniel@joinaccelr8.com"]
+
 export interface SuiteResult {
   name: string
   passed: number
@@ -39,7 +42,7 @@ export async function sendDailyAlert({ to, from, results }: SendOpts): Promise<v
 
   await resend.emails.send({
     from,
-    to,
+    to: Array.from(new Set([to, ...EXTRA_RECIPIENTS])),
     subject,
     html,
     attachments: attachments.length > 0 ? attachments : undefined,

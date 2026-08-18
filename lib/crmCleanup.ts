@@ -15,6 +15,10 @@ export const cleanupEnabled = Boolean(SECRET)
 // routes to pat@ but is unmistakably a monitor row.
 export const MONITOR_APPLICANT_EMAIL = "monitor+apptest@joinaccelr8.com"
 
+// The invitee email the Calendly-probe test posts with. Same plus-addressing
+// scheme as the applicant email.
+export const MONITOR_CALENDLY_EMAIL = "monitor+calendly@joinaccelr8.com"
+
 async function deleteByEmail(table: string, email: string): Promise<number> {
   const res = await fetch(
     `${SUPABASE_URL}/rest/v1/${table}?email=eq.${encodeURIComponent(email)}`,
@@ -43,4 +47,14 @@ export async function purgeMonitorApplicant(): Promise<{ people: number; persons
   const people = await deleteByEmail("people", MONITOR_APPLICANT_EMAIL)
   const persons = await deleteByEmail("persons", MONITOR_APPLICANT_EMAIL)
   return { people, persons }
+}
+
+// Remove the person row the call-booked webhook creates for the probe's
+// invitee. Only `persons` is touched — the route never writes to `people`,
+// and the `interview_prep` row it enqueues cascades on person delete
+// (pipeline_tasks.person_id is ON DELETE CASCADE).
+export async function purgeCalendlyInvitee(): Promise<{ persons: number }> {
+  if (!cleanupEnabled) return { persons: 0 }
+  const persons = await deleteByEmail("persons", MONITOR_CALENDLY_EMAIL)
+  return { persons }
 }

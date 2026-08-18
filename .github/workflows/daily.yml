@@ -26,6 +26,7 @@ jobs:
       COMPLETE_STRIPE_CHECKOUT: ${{ secrets.COMPLETE_STRIPE_CHECKOUT }}
       SUPABASE_URL: https://aytktpmqghhmhutawjtm.supabase.co
       SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+      CALENDLY_WEBHOOK_SECRET: ${{ secrets.CALENDLY_WEBHOOK_SECRET }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
